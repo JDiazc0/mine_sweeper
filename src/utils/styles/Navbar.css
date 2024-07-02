@@ -1,0 +1,70 @@
+.header {
+  width: 100%;
+  height: 4.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: white;
+  z-index: 100;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  margin: 0 2.5rem;
+}
+
+.title {
+  font-family: "Press Start 2P", system-ui;
+  font-size: 1rem;
+}
+
+.title:hover {
+  cursor: default;
+}
+
+.nav-ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+}
+
+.nav-ul-li {
+  margin-right: 1rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 5px;
+  font-family: inherit;
+  width: 80px;
+  height: 30px;
+  cursor: pointer;
+  background-color: #e8e8e8;
+}
+
+.btn:hover {
+  background-color: #dbffff;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.select {
+  border: none;
+  font-family: inherit;
+  width: 90px;
+  height: 30px;
+  text-align: center;
+  background-color: #e8e8e8;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+}
