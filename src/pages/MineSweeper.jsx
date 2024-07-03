@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Grid from "../components/Grid";
 
@@ -35,10 +35,6 @@ export default function MineSweeper() {
   const [isFlagMode, setIsFlagMode] = useState(false);
   const [gameOver, setGameOver] = useState(false);
 
-  useEffect(() => {
-    createMineMap();
-  }, [gridSize, difficulty]);
-
   /** Function to change the grid size */
   const handleGridSize = (event) => {
     const newSize = parseInt(event.target.value);
@@ -57,7 +53,7 @@ export default function MineSweeper() {
   };
 
   /** Function to create mine map */
-  const createMineMap = () => {
+  const createMineMap = useCallback(() => {
     let minePercentage;
     switch (difficulty) {
       case "medium":
@@ -90,7 +86,11 @@ export default function MineSweeper() {
     }
 
     setMineMap(newMineMap);
-  };
+  }, [difficulty, gridSize]);
+
+  useEffect(() => {
+    createMineMap();
+  }, [gridSize, difficulty, createMineMap]);
 
   /** Function to restart game */
   const restartGame = () => {
