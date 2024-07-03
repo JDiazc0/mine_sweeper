@@ -2,7 +2,8 @@ import React from "react";
 import "../utils/styles/Navbar.css";
 
 export default function Navbar(props) {
-  const { restartButton, mineFlag, isFlag, gridSize, difficult } = props;
+  const { restartButton, isLose, mineFlag, isFlag, gridSize, difficult } =
+    props;
 
   const handleSelectGrid = (event) => {
     gridSize(event);
@@ -16,7 +17,7 @@ export default function Navbar(props) {
     <>
       <header className="header">
         <nav className="nav">
-          <h2 className="title">Minesweeper</h2>
+          <h2 className="title">{isLose ? "Game Over" : "Minesweeper"}</h2>
           <ul className="nav-ul">
             <li className="nav-ul-li">
               <button className="btn" onClick={restartButton}>
