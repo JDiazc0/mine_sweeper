@@ -20,13 +20,12 @@ export default function Navbar(props) {
           <ul className="nav-ul">
             <li className="nav-ul-li">
               <button className="btn" onClick={restartButton}>
-                {" "}
                 Restart
               </button>
             </li>
             <li className="nav-ul-li">
               <button className="btn" onClick={mineFlag}>
-                {isFlag ? "Mine" : "Flag"}
+                {isFlag ? "Flag" : "Mine"}
               </button>
             </li>
             <li className="nav-ul-li">
@@ -36,7 +35,7 @@ export default function Navbar(props) {
                 defaultValue="40">
                 <option value="40">40 * 40</option>
                 <option value="50">50 * 50</option>
-                <option value="70">70 * 70</option>
+                <option value="60">60 * 60</option>
               </select>
             </li>
             <li className="nav-ul-li">
