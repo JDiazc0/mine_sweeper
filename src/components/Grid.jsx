@@ -1,13 +1,23 @@
 import React from "react";
+import "../utils/styles/Grid.css";
 
 function Box(props) {
-  const { boxClass, id, row, col, selectBox } = props;
+  const { boxClass, id, row, col, selectBox, value } = props;
 
   const handleClick = () => {
     selectBox(row, col);
   };
 
-  return <div className={boxClass} id={id} onClick={handleClick} />;
+  return (
+    <div className={boxClass} id={id} onClick={handleClick}>
+      {value !== "off" &&
+      value !== "void" &&
+      value !== "mine" &&
+      value !== "flag"
+        ? value
+        : ""}
+    </div>
+  );
 }
 
 export default function Grid(props) {
@@ -15,25 +25,17 @@ export default function Grid(props) {
   const width = cols * 20;
 
   const getBoxClass = (state) => {
+    if (typeof state === "number") {
+      return `box number-${state}`;
+    }
     switch (state) {
-      case "one":
-        return "box one";
-      case "two":
-        return "box two";
-      case "three":
-        return "box three";
-      case "four":
-        return "box four";
-      case "five":
-        return "box five";
-      case "six":
-        return "box six";
-      case "seven":
-        return "box seven";
-      case "eight":
-        return "box eight";
       case "void":
         return "box void";
+      case "mine":
+        return "box mine";
+      case "flag":
+        return "box flag";
+      case "off":
       default:
         return "box off";
     }
@@ -48,6 +50,7 @@ export default function Grid(props) {
         row={rowIdx}
         col={colIdx}
         selectBox={selectBox}
+        value={gridFull[rowIdx][colIdx]}
       />
     ))
   );
