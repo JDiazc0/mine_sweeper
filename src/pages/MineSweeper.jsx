@@ -7,6 +7,18 @@ const arrayClone = (arr) => {
   return arr.map((item) => (Array.isArray(item) ? arrayClone(item) : item));
 };
 
+/** directions neighbor */
+const directions = [
+  [-1, 0],
+  [-1, -1],
+  [-1, 1],
+  [0, -1],
+  [0, 1],
+  [1, 0],
+  [1, -1],
+  [1, 1],
+];
+
 export default function MineSweeper() {
   const [gridFull, setGridFull] = useState(
     Array(40)
@@ -21,6 +33,7 @@ export default function MineSweeper() {
   const [gridSize, setGridSize] = useState({ rows: 40, cols: 40 });
   const [difficulty, setDifficulty] = useState("easy");
   const [isFlagMode, setIsFlagMode] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
     createMineMap();
@@ -79,54 +92,116 @@ export default function MineSweeper() {
     setMineMap(newMineMap);
   };
 
+  /** Function to restart game */
+  const restartGame = () => {
+    setGameOver(false);
+    setGridFull(
+      Array(gridSize.rows)
+        .fill()
+        .map(() => Array(gridSize.cols).fill("off"))
+    );
+    createMineMap();
+  };
+
   /** Function to change flag to mine */
   const toggleFlagMode = () => {
     setIsFlagMode(!isFlagMode);
   };
 
-  /** Function to select one box */
-  const selectBox = (row, col) => {
-    const newGridFull = arrayClone(gridFull);
-    if (isFlagMode) {
-      newGridFull[row][col] = newGridFull[row][col] === "flag" ? "off" : "flag";
-    } else {
-      if (mineMap[row][col]) {
-        newGridFull[row][col] = "mine";
-      } else {
-        const adjacentMines = countAdjacentMines(mineMap, gridSize, row, col);
-        newGridFull[row][col] = adjacentMines > 0 ? adjacentMines : "void";
+  /** Function to open neighbors */
+  const openNeighbors = (grid, row, col) => {
+    for (const [dx, dy] of directions) {
+      const nx = row + dx;
+      const ny = col + dy;
+
+      if (nx >= 0 && nx < gridSize.rows && ny >= 0 && ny < gridSize.cols) {
+        if (grid[nx][ny] === "off") {
+          if (mineMap[nx][ny]) {
+            grid[nx][ny] = "mine";
+            setGameOver(true);
+          } else {
+            const adjacentMines = countAdjacentMines(mineMap, gridSize, nx, ny);
+            grid[nx][ny] = adjacentMines > 0 ? adjacentMines : "void";
+            if (grid[nx][ny] === "void") {
+              openNeighbors(grid, nx, ny);
+            }
+          }
+        }
       }
     }
-    setGridFull(newGridFull);
   };
 
-  /** Count mines adjacents */
+  /**Function to count mines adjacent */
   const countAdjacentMines = (mineMap, gridSize, x, y) => {
-    let mineCount = 0;
+    return countDirections(
+      gridSize,
+      directions,
+      0,
+      x,
+      y,
+      (nx, ny) => mineMap[nx][ny]
+    );
+  };
 
-    const directions = [
-      [-1, 0],
-      [-1, -1],
-      [-1, 1],
-      [0, -1],
-      [0, 1],
-      [1, 0],
-      [1, -1],
-      [1, 1],
-    ];
+  /** Function to count flags aroubd box */
+  const countFlagsAround = (row, col) => {
+    return countDirections(
+      gridSize,
+      directions,
+      0,
+      row,
+      col,
+      (nx, ny) => gridFull[nx][ny] === "flag"
+    );
+  };
 
+  /** Auxiliar function to count directions */
+  const countDirections = (gridSize, directions, counter, x, y, condition) => {
     for (const [dx, dy] of directions) {
       const nx = x + dx;
       const ny = y + dy;
 
       if (nx >= 0 && nx < gridSize.rows && ny >= 0 && ny < gridSize.cols) {
-        if (mineMap[nx][ny]) {
-          mineCount++;
+        if (condition(nx, ny)) {
+          counter++;
         }
       }
     }
 
-    return mineCount;
+    return counter;
+  };
+
+  /** Function to select one box */
+  const selectBox = (row, col) => {
+    if (gameOver) return;
+
+    const newGridFull = arrayClone(gridFull);
+
+    if (
+      isFlagMode &&
+      (newGridFull[row][col] === "off" || newGridFull[row][col] === "flag")
+    ) {
+      newGridFull[row][col] = newGridFull[row][col] === "flag" ? "off" : "flag";
+    } else {
+      if (mineMap[row][col]) {
+        newGridFull[row][col] = "mine";
+        setGameOver(true);
+      } else {
+        const adjacentMines = countAdjacentMines(mineMap, gridSize, row, col);
+        if (
+          typeof newGridFull[row][col] === "number" &&
+          countFlagsAround(row, col) === newGridFull[row][col]
+        ) {
+          openNeighbors(newGridFull, row, col);
+        } else {
+          newGridFull[row][col] = adjacentMines > 0 ? adjacentMines : "void";
+          if (newGridFull[row][col] === "void") {
+            openNeighbors(newGridFull, row, col);
+          }
+        }
+      }
+    }
+    setGridFull(newGridFull);
   };
 
   return (
@@ -134,6 +209,8 @@ export default function MineSweeper() {
       <Navbar
         mineFlag={toggleFlagMode}
         isFlag={isFlagMode}
+        restartButton={restartGame}
+        isLose={gameOver}
         gridSize={handleGridSize}
         difficult={handleDiffuculty}
       />
